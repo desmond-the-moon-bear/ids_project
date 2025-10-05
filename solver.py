@@ -14,7 +14,7 @@ OFFSET = 0.4
 BUCKETS_OFFSET = [b[0] * OFFSET for b in BUCKETS]
 
 
-SONGS = "summary/songs.csv"
+SONGS = "summary/songs_merged.csv"
 ARTISTS = "summary/artists.csv"
 
 @st.cache_data
