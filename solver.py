@@ -69,8 +69,8 @@ def generate_playlist(source_playlist, bpm_error, function: ScaledRunner):
             else: return False
         else:
             uri_to_id, songs = load_songs()
-            rec = rec.make_recommendations(source_playlist)
-            if rec: songs = songs[rec]
+            recs = rec.make_recommendations(source_playlist)
+            if recs: songs = songs[recs]
             else: return False
         artists = load_artists() 
 

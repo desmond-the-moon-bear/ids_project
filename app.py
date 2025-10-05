@@ -111,6 +111,6 @@ if st.session_state.generated:
     if event and len(event.selection.param_1) > 0:
         x0 = event.selection.param_1[0]["x0"]
         song_df = playlist[playlist["x0"] == x0].iloc[0]
-        url_text = f"{song_df["Name"]} by {song_df["Artist"]}"
+        url_text = f"{song_df["Title"]} by {song_df["Artist"]}"
         url = f"https://open.spotify.com/track/{song_df["uri"]}"
         st.link_button(url_text, url, width="stretch")
