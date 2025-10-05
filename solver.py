@@ -54,7 +54,6 @@ def choose_song(buckets):
     for bucket in buckets:
         song_count += len(bucket)
     song_index = rng.randrange(song_count)
-    bucket_index = 0
     for bucket in buckets:
         if song_index < len(bucket): return bucket.iloc[[song_index]];
         else: song_index -= len(bucket);
@@ -69,7 +68,7 @@ def generate_playlist(source_playlist, bpm_error, function: ScaledRunner):
             else: return False
         else:
             uri_to_id, songs = load_songs()
-            recs = rec.make_recommendations(source_playlist)
+            recs = rec.make_recommendations(source_playlist, uri_to_id)
             if recs: songs = songs[recs]
             else: return False
         artists = load_artists() 
