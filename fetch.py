@@ -1,4 +1,4 @@
-import io, numpy as np, pandas as pd, requests
+import io, numpy as np, pandas as pd, requests, streamlit as st
 
 REPO = "https://raw.githubusercontent.com/desmond-the-moon-bear/ids_project/main/"
 
