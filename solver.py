@@ -63,7 +63,7 @@ def choose_song(buckets):
 MAX_ITERATIONS = 300
 GAP_PERCENTAGE = 0.005
 def generate_playlist(source_playlist, bpm_error, function: ScaledRunner):
-    with st.spinner("Fetching data...", time=True):
+    with st.spinner("Fetching data...", show_time=True):
         if isinstance(source_playlist, bool):
             if source_playlist: uri_to_id, songs = load_songs()
             else: return False
@@ -74,7 +74,7 @@ def generate_playlist(source_playlist, bpm_error, function: ScaledRunner):
             else: return False
         artists = load_artists() 
 
-    with st.spinner("Generating playlist...", time=True):
+    with st.spinner("Generating playlist...", show_time=True):
         buckets = make_buckets(songs)
 
         if function.duration < 1000:

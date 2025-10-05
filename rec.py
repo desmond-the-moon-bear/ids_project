@@ -63,7 +63,7 @@ def recommend_multi_rrf(
     return ids[cand[top]].astype(int).tolist()
 
 def make_recommendations(source_playlist, uri_to_id):
-    with st.spinner("Making recommendations...", time=True):
+    with st.spinner("Making recommendations...", show_time=True):
         try:
             playlist = pd.read_csv(source_playlist)
             uris = playlist['Spotify - id'].to_list()
