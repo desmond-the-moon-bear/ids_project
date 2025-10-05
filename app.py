@@ -1,5 +1,4 @@
 import altair as alt
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -90,7 +89,7 @@ if st.session_state.generated:
             x  = alt.X("x0", type="quantitative", title="Time", scale=x_scale),
             x2 = "x1",
             y  = alt.Y("bpm", type="quantitative", title="BPM", scale=y_scale),
-            tooltip = ["Name", "Artist"],
+            tooltip = ["Title", "Artist"],
             color = alt.condition(single_selection, alt.value(cyan), alt.value(teal)),
             fillOpacity = alt.condition(single_selection, alt.value(1), alt.value(0.5))
         ).add_params(single_selection)
@@ -105,7 +104,7 @@ if st.session_state.generated:
         icon=":material/download:",
     )
 
-    playlist_df = playlist[["Name", "Artist", "bpm", "duration"]]
+    playlist_df = playlist[["Title", "Artist", "bpm", "duration"]]
     st.table(playlist_df)
 
     event = st.altair_chart(chart, key = "playlist_chart", on_select = "rerun")
