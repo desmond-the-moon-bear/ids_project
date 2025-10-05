@@ -20,7 +20,7 @@ ARTISTS = "summary/artists.csv"
 @st.cache_data
 def load_songs():
     songs = pd.read_csv(fetch.REPO + SONGS);
-    uri_to_id = dict(zip(songs["uri"], df["song_id"].astype(int)))
+    uri_to_id = dict(zip(songs["uri"], songs["song_id"].astype(int)))
     return uri_to_id, songs
 
 @st.cache_data
@@ -69,7 +69,7 @@ def generate_playlist(source_playlist, bpm_error, function: ScaledRunner):
             else: return False
         else:
             uri_to_id, songs = load_songs()
-            rec = make_recommendations(source_playlist)
+            rec = rec.make_recommendations(source_playlist)
             if rec: songs = songs[rec]
             else: return False
         artists = load_artists() 
