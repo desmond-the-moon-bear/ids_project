@@ -66,12 +66,17 @@ st.altair_chart(line_chart, key = "line_chart")
 
 source_playlist = st.file_uploader("Choose a playlist", type="csv")
 
+error     = st.slider("BPM Error", 1, 10)
+neighbors = st.slider("K Neighbors", 100, 1000)
+
 if st.button("Generate"):
     st.session_state.generated = True
     st.session_state.playlist = solver.generate_playlist(
         source_playlist if source_playlist is not None else True,
-        1, run_function
+        error, run_function, K=neighbors
     )
+    if st.session_state.playlist.empty:
+        st.warning("Not enough suggestions to generate playlist. Increase K Neighbors for better results.")
 
 if st.button("Clear"):
     st.session_state.generated = False
@@ -80,7 +85,7 @@ if st.button("Clear"):
 def convert_for_download(playlist: pd.DataFrame):
     return playlist["uri"].to_csv(index=False).encode("utf-8")
 
-if st.session_state.generated:
+if st.session_state.generated and not st.session_state.playlist.empty:
     playlist = st.session_state.playlist
     x_scale = alt.Scale(domain=[0, playlist["duration"].sum()])
     single_selection = alt.selection_point()
@@ -105,6 +110,7 @@ if st.session_state.generated:
     )
 
     playlist_df = playlist[["Title", "Artist", "bpm", "duration"]]
+    playlist_df.index = range(1, len(playlist_df)+1)
     st.table(playlist_df)
 
     event = st.altair_chart(chart, key = "playlist_chart", on_select = "rerun")

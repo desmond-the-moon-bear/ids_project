@@ -62,7 +62,7 @@ def recommend_multi_rrf(
     top = top[np.argsort(rrf[top])[::-1]]
     return ids[cand[top]].astype(int).tolist()
 
-def make_recommendations(source_playlist, uri_to_id):
+def make_recommendations(source_playlist, uri_to_id, K: int = 100):
     with st.spinner("Making recommendations...", show_time=True):
         try:
             playlist = pd.read_csv(source_playlist)
@@ -70,5 +70,5 @@ def make_recommendations(source_playlist, uri_to_id):
         except: return []
         ids, emb, id_to_row, index = load_model()
         seed_ids = [uri_to_id[uri] for uri in uris if uri in uri_to_id]
-        if seed_ids: return recommend_multi_rrf(ids, emb, id_to_row, index, seed_ids, K=100)
+        if seed_ids: return recommend_multi_rrf(ids, emb, id_to_row, index, seed_ids, K=K)
         else: return []

@@ -19,8 +19,10 @@ ARTISTS = "summary/artists.csv"
 
 @st.cache_data
 def load_songs():
-    songs = pd.read_csv(fetch.REPO + SONGS);
+    songs = pd.read_csv(fetch.REPO + SONGS)
+    songs.index = songs["song_id"]
     uri_to_id = dict(zip(songs["uri"], songs["song_id"].astype(int)))
+    del songs["song_id"]
     return uri_to_id, songs
 
 @st.cache_data
@@ -53,23 +55,24 @@ def choose_song(buckets):
     song_count = 0
     for bucket in buckets:
         song_count += len(bucket)
+    if song_count == 0: return pd.DataFrame()
     song_index = rng.randrange(song_count)
     for bucket in buckets:
         if song_index < len(bucket): return bucket.iloc[[song_index]];
         else: song_index -= len(bucket);
-    return pd.empty
+    return pd.DataFrame()
 
 MAX_ITERATIONS = 300
-GAP_PERCENTAGE = 0.005
-def generate_playlist(source_playlist, bpm_error, function: ScaledRunner):
+GAP_PERCENTAGE = 0.003
+def generate_playlist(source_playlist, bpm_error, function: ScaledRunner, K: int = 100):
     with st.spinner("Fetching data...", show_time=True):
         if isinstance(source_playlist, bool):
             if source_playlist: uri_to_id, songs = load_songs()
             else: return False
         else:
             uri_to_id, songs = load_songs()
-            recs = rec.make_recommendations(source_playlist, uri_to_id)
-            if recs: songs = songs[recs]
+            recs = rec.make_recommendations(source_playlist, uri_to_id, K=K)
+            if recs: songs = songs.loc[recs]
             else: return False
         artists = load_artists() 
 
@@ -82,13 +85,16 @@ def generate_playlist(source_playlist, bpm_error, function: ScaledRunner):
         current_duration = 0
         result = []
         iter = 0
+        chosen_songs = set()
         while current_duration < function.duration:
             targets = make_target_bpm(current_duration, function)
             filtered_buckets = filter_buckets_by_targets(buckets, targets, bpm_error)
             song = choose_song(filtered_buckets)
             if len(song) > 0:
-                current_duration += song["duration_ms"].iloc[0]
-                result.append(song)
+                if not song["uri"].iloc[0] in chosen_songs:
+                    current_duration += song["duration_ms"].iloc[0]
+                    result.append(song)
+                    chosen_songs.add(song["uri"].iloc[0])
             else: break;
             iter += 1
             if iter > MAX_ITERATIONS: break;
@@ -96,6 +102,7 @@ def generate_playlist(source_playlist, bpm_error, function: ScaledRunner):
         if function.duration > 1000:
             function.duration /= MINUTE_MS;
 
+        if not result: return pd.DataFrame()
         result = pd.concat(result, ignore_index=True)
         result["duration"] = result["duration_ms"] / MINUTE_MS
         result["x1"] = result["duration"].cumsum()
