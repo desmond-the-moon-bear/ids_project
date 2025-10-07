@@ -318,7 +318,7 @@ with col_vis:
                     x2="x1",
                     y=alt.Y("bpm", type="quantitative",
                             title="BPM", scale=y_scale),
-                    tooltip=["Name", "Artist"],
+                    tooltip=["Title", "Artist"],
                     color=alt.condition(
                         single_selection,
                         alt.value(wine),
