@@ -18,8 +18,8 @@ rose      = "#cc6677"
 wine      = "#882255"
 purple    = "#aa4499"
 
-if not 'generated' in st.session_state:
-    st.session_state.generated = False
+if not 'status' in st.session_state:
+    st.session_state.status = False
 
 MIN_BPM = 50
 max_bpm     = st.slider("Max Intensity",          90,  230)
@@ -66,26 +66,32 @@ st.altair_chart(line_chart, key = "line_chart")
 
 source_playlist = st.file_uploader("Choose a playlist", type="csv")
 
-error     = st.slider("BPM Error", 1, 10)
+error     = st.slider("BPM Error", 1, 20)
 neighbors = st.slider("K Neighbors", 100, 1000)
 
 if st.button("Generate"):
-    st.session_state.generated = True
-    st.session_state.playlist = solver.generate_playlist(
+    st.session_state.status, st.session_state.playlist = solver.generate_playlist(
         source_playlist if source_playlist is not None else True,
         error, run_function, K=neighbors
     )
-    if st.session_state.playlist.empty:
-        st.warning("Not enough suggestions to generate playlist. Increase K Neighbors for better results.")
+    if not st.session_state.status:
+        st.warning("Not enough suggestions to generate playlist. Increase\
+            K Neighbors or BPM Error for better results. Changing the intensity function\
+            may also yield better results.")
 
 if st.button("Clear"):
-    st.session_state.generated = False
+    st.session_state.status = False
 
 @st.cache_data
 def convert_for_download(playlist: pd.DataFrame):
     return playlist["uri"].to_csv(index=False).encode("utf-8")
 
-if st.session_state.generated and not st.session_state.playlist.empty:
+if st.session_state.status != False:
+    if st.session_state.status == "partial":
+        st.warning("Not enough suggestions to generate a full playlist. Increase\
+            K Neighbors or BPM Error for better results. Changing the intensity function\
+            may also yield better results.")
+
     playlist = st.session_state.playlist
     x_scale = alt.Scale(domain=[0, playlist["duration"].sum()])
     single_selection = alt.selection_point()

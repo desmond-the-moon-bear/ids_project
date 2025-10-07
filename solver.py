@@ -68,13 +68,13 @@ def generate_playlist(source_playlist, bpm_error, function: ScaledRunner, K: int
     with st.spinner("Fetching data...", show_time=True):
         if isinstance(source_playlist, bool):
             if source_playlist: uri_to_id, songs = load_songs()
-            else: return False
+            else: return False, None
         else:
             uri_to_id, songs = load_songs()
             recs = rec.make_recommendations(source_playlist, uri_to_id, K=K)
             if recs: songs = songs.loc[recs]
-            else: return False
-        artists = load_artists() 
+            else: return False, None
+        artists = load_artists()
 
     with st.spinner("Generating playlist...", show_time=True):
         buckets = make_buckets(songs)
@@ -99,10 +99,13 @@ def generate_playlist(source_playlist, bpm_error, function: ScaledRunner, K: int
             iter += 1
             if iter > MAX_ITERATIONS: break;
 
+        status = "ok"
+        if current_duration < function.duration: status = "partial"
+
         if function.duration > 1000:
             function.duration /= MINUTE_MS;
 
-        if not result: return pd.DataFrame()
+        if not result: return False, None
         result = pd.concat(result, ignore_index=True)
         result["duration"] = result["duration_ms"] / MINUTE_MS
         result["x1"] = result["duration"].cumsum()
@@ -112,4 +115,4 @@ def generate_playlist(source_playlist, bpm_error, function: ScaledRunner, K: int
         result["artist"] = result["artist"].map(lambda index: artists["name"].iloc[index])
         result = result.rename(columns={"name": "Title", "artist": "Artist"})
 
-    return result
+    return status, result
