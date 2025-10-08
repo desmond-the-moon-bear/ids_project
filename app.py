@@ -245,7 +245,7 @@ with col_pref:
         )
         neighbors = st.slider("K Neighbors", 100, 1000,
             help="  "
-        ))
+        )
         max_stop = max(max_stop, max_start)
 
         run_function = run.ScaledRunner(
