@@ -22,6 +22,7 @@ pale_grey = "#dddddd"
 
 OI_BLUE = "#0072B2"
 OI_SKY = "#56B4E9"
+OI_SKY_t = "#5193B9CE"
 OI_GREEN = "#009E73"
 OI_BLACK = "#000000"
 OI_GREY = "#7A7A7A"
@@ -45,8 +46,8 @@ html, body, [data-testid="stAppViewContainer"] {{
 
 .rr-hero {{
   width: 100%;
-  margin: 0 0 1rem 0;
-  background: linear-gradient(180deg, {OI_SKY}, {OI_BLUE});
+  margin: 2rem 0 1rem 0;
+  background: {OI_SKY_t};
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
   border-radius: 26px;
   padding: 2rem 1rem;
@@ -73,7 +74,7 @@ html, body, [data-testid="stAppViewContainer"] {{
   background: var(--secondary-background-color) !important;
   border: 1px solid rgba(0,0,0,.002) !important;
   border-radius: 22px !important;
-  box-shadow: 0 12px 30px {OI_SKY}22, 0 0 2px {wine}22;
+  box-shadow: 0 12px 30px {OI_SKY}22;
 }}
 
 /* Typography */
@@ -147,7 +148,7 @@ div.stButton > button:active,
 [data-baseweb="notification"] {{
   border-radius: 14px; background: {OI_SKY}15;
   border: 1px solid {OI_SKY}55;
-  color: {wine} !important;
+  color: {OI_BLUE} !important;
 }}
 
 /* Links */
