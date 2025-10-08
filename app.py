@@ -157,11 +157,10 @@ a, .markdown-text-container a {{ color: {wine}; }}
 a:hover {{ filter: brightness(0.95); }}
 
 /* Tables */
-.stTable {
+.stTable {{
   margin-top: 0.5rem; 
-}
+}}
 .stTable thead tr th {{
-  margin: 0.5rem 0 0.5rem 0;
   background: {OI_SKY}20 !important; color: {OI_BLUE} !important; font-weight: 800 !important;
   border-bottom: 2px solid {wine}33 !important;
 }}
