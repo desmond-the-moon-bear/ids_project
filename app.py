@@ -188,8 +188,8 @@ a:hover {{ filter: brightness(0.95); }}
 st.markdown('<div class="rr-hero"><h1>RhythmRun – Personalized Workout Playlists</h1></div>',
             unsafe_allow_html=True)
 
-if not 'generated' in st.session_state:
-    st.session_state.generated = False
+if not 'status' in st.session_state:
+    st.session_state.status = False
 
 col_pref, col_vis, col_table = st.columns([0.8, 1.5, 1.5], gap="small")
 
@@ -203,7 +203,7 @@ with col_pref:
         st.caption(
             "Upload a seed playlist and adjust the workout curve. The curve updates live as you slide.")
         source_playlist = st.file_uploader(
-            "Upload playlist (CSV)", type=["csv"],
+            "Upload a playlist (CSV)", type=["csv"],
             help="Seed playlist; URIs/IDs are used to anchor the generated set."
         )
 
@@ -240,8 +240,12 @@ with col_pref:
             "Descent Start %", 0, 100, 100,
             help="Point in workout (0–100%) where the descent begins (start of cool-down)."
         )
-        error = st.slider("BPM Error", 1, 10)
-        neighbors = st.slider("K Neighbors", 100, 1000)
+        error = st.slider("BPM Error", 1, 20,
+            help="  "
+        )
+        neighbors = st.slider("K Neighbors", 100, 1000,
+            help="  "
+        ))
         max_stop = max(max_stop, max_start)
 
         run_function = run.ScaledRunner(
@@ -266,12 +270,12 @@ with col_pref:
         })
 
         if st.button("Generate", use_container_width=True):
-            st.session_state.generated = True
-            st.session_state.playlist = solver.generate_playlist(
-                source_playlist if source_playlist is not None else True, error, run_function, K=neighbors)
-            if st.session_state.playlist.empty:
+            st.session_state.status, st.session_state.playlist = solver.generate_playlist(source_playlist if source_playlist is not None else True, error, run_function, K=neighbors)
+            if not st.session_state.status:
                 st.warning(
-                    "Not enough suggestions to generate playlist. Increase K Neighbors for better results.")
+                    "Not enough suggestions to generate playlist. Increase\
+            K Neighbors or BPM Error for better results. Changing the intensity function\
+            may also yield better results.")
 
         if st.button("Clear", use_container_width=True):
             st.session_state.generated = False
@@ -301,7 +305,12 @@ with col_vis:
         st.markdown("<div class='subtle'>Workout Timeline</div>",
                     unsafe_allow_html=True)
 
-        if st.session_state.generated and not st.session_state.playlist.empty:
+        if st.session_state.status != False:
+            if st.session_state.status == "partial":
+                st.warning("Not enough suggestions to generate a full playlist. Increase\
+                    K Neighbors or BPM Error for better results. Changing the intensity function\
+                    may also yield better results.")
+
             playlist = st.session_state.playlist
             x_scale = alt.Scale(domain=[0, playlist["duration"].sum()])
             single_selection = alt.selection_point()
@@ -354,14 +363,13 @@ with col_table:
             "<div class='section-title'>Generated Playlist</div>", unsafe_allow_html=True)
 
         if st.session_state.get("generated", False):
-            playlist = st.session_state.playlist
             playlist_df = playlist[["Title", "Artist", "bpm", "duration"]]
             playlist_df.index = range(1, len(playlist_df)+1)
             st.table(playlist_df)
 
             @st.cache_data
-            def convert_for_download(playlist_df: pd.DataFrame):
-                return playlist_df["uri"].to_csv(index=False).encode("utf-8")
+            def convert_for_download(playlist: pd.DataFrame):
+                return playlist["uri"].to_csv(index=False).encode("utf-8")
 
             csv = convert_for_download(playlist)
             st.download_button(
