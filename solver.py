@@ -16,6 +16,7 @@ BUCKETS_OFFSET = [b[0] * OFFSET for b in BUCKETS]
 
 SONGS = "summary/songs_merged.csv"
 ARTISTS = "summary/artists.csv"
+ALBUMS = "summary/albums.csv"
 
 @st.cache_data
 def load_songs():
@@ -27,6 +28,8 @@ def load_songs():
 
 @st.cache_data
 def load_artists(): return pd.read_csv(fetch.REPO + ARTISTS);
+@st.cache_data
+def load_albums(): return pd.read_csv(fetch.REPO + ALBUMS);
 
 def make_buckets(songs: pd.DataFrame):
     buckets = []
@@ -62,9 +65,19 @@ def choose_song(buckets):
         else: song_index -= len(bucket);
     return pd.DataFrame()
 
+KMIN = 100
+KMAX = 10000
+KSTEP = 200
+def try_generate_playlist(source_playlist, bpm_error, function: ScaledRunner):
+    for i in range(KMIN, KMAX+1, KSTEP):
+        status, playlist = generate_playlist(source_playlist, bpm_error, function, i)
+        if status == "ok":
+            return "ok", playlist
+    return False, None
+
 MAX_ITERATIONS = 300
 GAP_PERCENTAGE = 0.003
-def generate_playlist(source_playlist, bpm_error, function: ScaledRunner, K: int = 100):
+def generate_playlist(source_playlist, bpm_error, function: ScaledRunner, K):
     with st.spinner("Fetching data...", show_time=True):
         if isinstance(source_playlist, bool):
             if source_playlist: uri_to_id, songs = load_songs()
@@ -106,13 +119,18 @@ def generate_playlist(source_playlist, bpm_error, function: ScaledRunner, K: int
             function.duration /= MINUTE_MS;
 
         if not result: return False, None
+        albums = load_albums()
         result = pd.concat(result, ignore_index=True)
-        result["duration"] = result["duration_ms"] / MINUTE_MS
+        result["duration"] = (result["duration_ms"] / MINUTE_MS).round(decimals=1)
+        result["bpm"] = result["bpm"].round(decimals=1)
         result["x1"] = result["duration"].cumsum()
         result["x1"] = result["x1"] - function.duration * GAP_PERCENTAGE
         result["x0"] = result["x1"].shift(fill_value=0)
         result["x0"] = result["x0"] + function.duration * GAP_PERCENTAGE
         result["artist"] = result["artist"].map(lambda index: artists["name"].iloc[index])
-        result = result.rename(columns={"name": "Title", "artist": "Artist"})
+        result["album"] = result["album"].map(lambda index: albums["name"].iloc[index])
+
+        del result["occurrences"]
+        result = result.rename(columns={"name": "Title", "artist": "Artist", "album": "Album"})
 
     return status, result

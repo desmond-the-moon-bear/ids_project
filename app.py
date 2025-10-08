@@ -210,7 +210,7 @@ with col_pref:
             help="Seed playlist; URIs/IDs are used to anchor the generated set."
         )
 
-        MIN_BPM = 50
+        MIN_BPM = 65
         max_bpm = st.slider(
             "Max Intensity", 90, 210, 170,
             help="Peak BPM target (height of the plateau). Raises the whole curve proportionally."
@@ -246,9 +246,9 @@ with col_pref:
         error = st.slider("BPM Error", 1, 20,
             help="  "
         )
-        neighbors = st.slider("K Neighbors", 100, 1000,
-            help="  "
-        )
+        # neighbors = st.slider("K Neighbors", 100, 1000,
+        #     help="  "
+        # )
         max_stop = max(max_stop, max_start)
 
         run_function = run.ScaledRunner(
@@ -273,12 +273,17 @@ with col_pref:
         })
 
         if st.button("Generate", use_container_width=True):
-            st.session_state.status, st.session_state.playlist = solver.generate_playlist(source_playlist if source_playlist is not None else True, error, run_function, K=neighbors)
+            st.session_state.status, st.session_state.playlist = \
+            solver.try_generate_playlist(
+                source_playlist if source_playlist is not None else True,
+                error,
+                run_function,
+            )
             if not st.session_state.status:
                 st.warning(
                     "Not enough suggestions to generate playlist. Increase\
-            K Neighbors or BPM Error for better results. Changing the intensity function\
-            may also yield better results.")
+                    BPM Error for better results. Changing the intensity function\
+                    may also yield better results.")
 
         if st.button("Clear", use_container_width=True):
             st.session_state.status = False
@@ -311,7 +316,7 @@ with col_vis:
         if st.session_state.status != False:
             if st.session_state.status == "partial":
                 st.warning("Not enough suggestions to generate a full playlist. Increase\
-                    K Neighbors or BPM Error for better results. Changing the intensity function\
+                    BPM Error for better results. Changing the intensity function\
                     may also yield better results.")
 
             playlist = st.session_state.playlist
@@ -365,8 +370,8 @@ with col_table:
         st.markdown(
             "<div class='section-title'>Generated Playlist</div>", unsafe_allow_html=True)
 
-        if st.session_state.get("status") not in [False, None]:
-            playlist_df = playlist[["Title", "Artist", "bpm", "duration"]]
+        if st.session_state.status != False:
+            playlist_df = playlist[["Title", "Album", "Artist", "bpm", "duration"]]
             playlist_df.index = range(1, len(playlist_df)+1)
             st.table(playlist_df)
 
