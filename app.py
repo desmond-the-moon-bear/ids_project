@@ -278,7 +278,7 @@ with col_pref:
             may also yield better results.")
 
         if st.button("Clear", use_container_width=True):
-            st.session_state.generated = False
+            st.session_state.status = False
             st.session_state.pop("playlist", None)
 
 
@@ -362,7 +362,7 @@ with col_table:
         st.markdown(
             "<div class='section-title'>Generated Playlist</div>", unsafe_allow_html=True)
 
-        if st.session_state.get("generated", False):
+        if st.session_state.get("status") not in [False, None]:
             playlist_df = playlist[["Title", "Artist", "bpm", "duration"]]
             playlist_df.index = range(1, len(playlist_df)+1)
             st.table(playlist_df)
