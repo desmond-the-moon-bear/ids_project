@@ -146,6 +146,7 @@ div.stButton > button:active,
 
 /* Info boxes */
 [data-baseweb="notification"] {{
+  margin: 0.5rem 0 0.5rem 0;
   border-radius: 14px; background: {OI_SKY}15;
   border: 1px solid {OI_SKY}55;
   color: {OI_BLUE} !important;
@@ -157,6 +158,7 @@ a:hover {{ filter: brightness(0.95); }}
 
 /* Tables */
 .stTable thead tr th {{
+  margin: 0.5rem 0 0.5rem 0;
   background: {OI_SKY}20 !important; color: {OI_BLUE} !important; font-weight: 800 !important;
   border-bottom: 2px solid {wine}33 !important;
 }}
