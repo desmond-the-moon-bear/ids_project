@@ -45,11 +45,14 @@ html, body, [data-testid="stAppViewContainer"] {{
 
 .rr-hero {{
   width: 100%;
+  margin: 0 0 1rem 0;
   background: linear-gradient(180deg, {OI_SKY}, {OI_BLUE});
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
   border-radius: 26px;
   padding: 2rem 1rem;
   text-align: center;
+  display: flex; align-items: center; 
+  justify-content: center; text-align: center;
 }}
 
 .rr-hero h1 {{
@@ -68,7 +71,7 @@ html, body, [data-testid="stAppViewContainer"] {{
 /* Floating cards */
 [data-testid="stVerticalBlockBorderWrapper"] {{
   background: var(--secondary-background-color) !important;
-  border: 1px solid rgba(0,0,0,.05) !important;
+  border: 1px solid rgba(0,0,0,.002) !important;
   border-radius: 22px !important;
   box-shadow: 0 12px 30px {OI_SKY}22, 0 0 2px {wine}22;
 }}
