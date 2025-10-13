@@ -217,7 +217,7 @@ with col_pref:
 
         MIN_BPM = 65
         max_bpm = st.slider(
-            "Max Intensity", 90, 210, 170,
+            "Max Intensity", 90, 190, 170,
             help="Peak BPM target (height of the plateau). Raises the whole curve proportionally."
         )
         duration = st.slider(
@@ -226,11 +226,11 @@ with col_pref:
         )
         climb = st.slider(
             "Climb Smoothstep", 0, 6, 3,
-            help="Controls ramp-up smoothness. Higher = slower, smoother rise; lower = steeper acceleration."
+            help="Controls ramp-up smoothness. Higher = longer rise with a sudden increase; lower = less change in acceleration."
         )
         descent = st.slider(
             "Descent Smoothstep", 0, 6, 3,
-            help="Controls cool-down smoothness. Higher = longer, gentler descent; lower = sharper drop."
+            help="Controls cool-down smoothness. Higher = longer descent with a sharp drop; lower = more gradual drop."
         )
         min_climb = st.slider(
             "Start Intensity %", 0, 100, 30,
@@ -249,11 +249,8 @@ with col_pref:
             help="Point in workout (0–100%) where the descent begins (start of cool-down)."
         )
         error = st.slider("BPM Error", 1, 20,
-            help="  "
+            help="How much a song can differ from the BPM sampled from the curve."
         )
-        # neighbors = st.slider("K Neighbors", 100, 1000,
-        #     help="  "
-        # )
         max_stop = max(max_stop, max_start)
 
         run_function = run.ScaledRunner(
